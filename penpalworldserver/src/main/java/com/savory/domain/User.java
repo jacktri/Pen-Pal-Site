@@ -4,7 +4,6 @@ package com.savory.domain;
 import lombok.*;
 import javax.persistence.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -18,6 +17,9 @@ public class User {
     @Column
     @GeneratedValue
     private Long id;
+
+    @Version
+    private Integer version;
 
     @Column
     private String email;
@@ -78,14 +80,5 @@ public class User {
         message.setOwner(this);
         sender.sendMessage(message);
         messages.add(message);
-    }
-    @Override
-    public String toString() {
-
-        return this.email + "'s teammates => "
-                + Optional.ofNullable(this.penpals).orElse(
-                Collections.emptySet()).stream()
-                .map(person -> person.email)
-                .collect(Collectors.toList());
     }
 }

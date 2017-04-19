@@ -20,6 +20,9 @@ public class Message {
     @GeneratedValue
     private Long id;
 
+    @Version
+    private Integer version;
+
     @Column
     private LocalDateTime sentDateTime;
 

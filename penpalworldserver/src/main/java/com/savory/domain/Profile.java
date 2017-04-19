@@ -18,7 +18,10 @@ public class Profile {
     @Column
     @GeneratedValue
     @Id
-private Long id;
+    private Long id;
+
+    @Version
+    private Integer version;
 
     @Column
     private String profileFileLocation;

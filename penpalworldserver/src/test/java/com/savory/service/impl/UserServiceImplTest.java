@@ -41,6 +41,7 @@ public class UserServiceImplTest {
     @Test
     public void createNewUser() {
         UserDto userDto = serviceHelper.createUserDto("email");
+        userDto.setProfile(null);
         User user = testConverter.convert(userDto, User.class);
         when(userRepository.saveAndFlush(user)).thenReturn(user);
         UserDto actual = testee.createUser(serviceHelper.createUserDto("email"));

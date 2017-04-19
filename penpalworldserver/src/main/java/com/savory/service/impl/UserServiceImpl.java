@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -30,8 +31,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserDto findUserByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        return converter.convert(user, UserDto.class);
+        return converter.convert(findByEmail.apply(email), UserDto.class);
     }
 
     @Override
@@ -51,13 +51,12 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void deleteUser(UserDto userDto) {
-        User user = userRepository.findByEmail(userDto.getEmail());
-        userRepository.delete(user);
+        userRepository.delete(findByUserDto.apply(userDto));
     }
 
     @Override
     public UserDto updateUser(UserDto userDto) {
-        User user = userRepository.findByEmail(userDto.getEmail());
+        User user = findByUserDto.apply(userDto);
         updateUserValues(user, userDto);
         updateFriends(user, userDto);
         userRepository.saveAndFlush(user);
@@ -110,4 +109,7 @@ public class UserServiceImpl implements UserService{
             existingUser.setProfile(profile);
         }
     }
+
+    private Function<String, User> findByEmail = x -> userRepository.findByEmail(x);
+    private Function<UserDto, User> findByUserDto = x -> findByEmail.apply(x.getEmail());
 }
