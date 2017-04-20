@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.*;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -28,6 +28,13 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private Converter converter;
+
+    private Function<String, User> findByEmail = x -> userRepository.findByEmail(x);
+    private Function<UserDto, User> findByUserDto = x -> findByEmail.apply(x.getEmail());
+    private Consumer<User> saveUser = x -> userRepository.saveAndFlush(x);
+    private BiConsumer<User, UserDto> updateUserValuesFunction = (x, y) -> updateUserValues(x,y);
+    private BiConsumer<User, UserDto> updateFriendsFunction = (x, y) -> updateFriends(x,y);
+    private BiConsumer<User, UserDto> updateUserAndFriends = (x, y) -> updateUserValuesFunction.andThen(updateFriendsFunction).accept(x,y);
 
     @Override
     public UserDto findUserByEmail(String email) {
@@ -45,7 +52,7 @@ public class UserServiceImpl implements UserService{
                 .profileViews(0)
                 .build());
         user.getProfile().setUser(user);
-        userRepository.saveAndFlush(user);
+        saveUser.accept(user);
         return converter.convert(user, UserDto.class);
     }
 
@@ -57,23 +64,25 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserDto updateUser(UserDto userDto) {
         User user = findByUserDto.apply(userDto);
-        updateUserValues(user, userDto);
-        updateFriends(user, userDto);
-        userRepository.saveAndFlush(user);
+        updateUserAndFriends.accept(user,userDto);
+
+        saveUser.accept(user);
+
         return converter.convert(user, UserDto.class);
     }
 
-    private void updateFriends(User existingUser, UserDto newUser){
+    private User updateFriends(User existingUser, UserDto newUser){
         if(null == newUser.getPenpalEmails()){
-            return;
+            return existingUser;
         }
         Set<User> users = newUser.getPenpalEmails().stream()
                 .map(email -> userRepository.findByEmail(email))
                 .collect(toSet());
         users.forEach(user -> existingUser.addFriend(user));
+        return existingUser;
     }
 
-    private void updateUserValues(User existingUser, UserDto newUser){
+    private User updateUserValues(User existingUser, UserDto newUser){
 
         if(null != newUser.getPassword()){
             existingUser.setPassword(newUser.getPassword());
@@ -108,8 +117,6 @@ public class UserServiceImpl implements UserService{
             profile.setUser(existingUser);
             existingUser.setProfile(profile);
         }
+        return existingUser;
     }
-
-    private Function<String, User> findByEmail = x -> userRepository.findByEmail(x);
-    private Function<UserDto, User> findByUserDto = x -> findByEmail.apply(x.getEmail());
 }
