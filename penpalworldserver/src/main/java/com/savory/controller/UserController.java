@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
-@Api(value = "usercontroller", description = "controller for users")
 public class UserController {
 
     @Autowired

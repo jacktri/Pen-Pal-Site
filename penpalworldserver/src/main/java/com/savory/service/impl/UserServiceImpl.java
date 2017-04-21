@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.function.*;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -29,16 +29,10 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private Converter converter;
 
-    private Function<String, User> findByEmail = x -> userRepository.findByEmail(x);
-    private Function<UserDto, User> findByUserDto = x -> findByEmail.apply(x.getEmail());
-    private Consumer<User> saveUser = x -> userRepository.saveAndFlush(x);
-    private BiConsumer<User, UserDto> updateUserValuesFunction = (x, y) -> updateUserValues(x,y);
-    private BiConsumer<User, UserDto> updateFriendsFunction = (x, y) -> updateFriends(x,y);
-    private BiConsumer<User, UserDto> updateUserAndFriends = (x, y) -> updateUserValuesFunction.andThen(updateFriendsFunction).accept(x,y);
-
     @Override
     public UserDto findUserByEmail(String email) {
-        return converter.convert(findByEmail.apply(email), UserDto.class);
+        User user = userRepository.findByEmail(email);
+        return converter.convert(user, UserDto.class);
     }
 
     @Override
@@ -52,37 +46,36 @@ public class UserServiceImpl implements UserService{
                 .profileViews(0)
                 .build());
         user.getProfile().setUser(user);
-        saveUser.accept(user);
+        userRepository.saveAndFlush(user);
         return converter.convert(user, UserDto.class);
     }
 
     @Override
     public void deleteUser(UserDto userDto) {
-        userRepository.delete(findByUserDto.apply(userDto));
+        User user = userRepository.findByEmail(userDto.getEmail());
+        userRepository.delete(user);
     }
 
     @Override
     public UserDto updateUser(UserDto userDto) {
-        User user = findByUserDto.apply(userDto);
-        updateUserAndFriends.accept(user,userDto);
-
-        saveUser.accept(user);
-
+        User user = userRepository.findByEmail(userDto.getEmail());
+        updateUserValues(user, userDto);
+        updateFriends(user, userDto);
+        userRepository.saveAndFlush(user);
         return converter.convert(user, UserDto.class);
     }
 
-    private User updateFriends(User existingUser, UserDto newUser){
+    private void updateFriends(User existingUser, UserDto newUser){
         if(null == newUser.getPenpalEmails()){
-            return existingUser;
+            return;
         }
         Set<User> users = newUser.getPenpalEmails().stream()
                 .map(email -> userRepository.findByEmail(email))
                 .collect(toSet());
         users.forEach(user -> existingUser.addFriend(user));
-        return existingUser;
     }
 
-    private User updateUserValues(User existingUser, UserDto newUser){
+    private void updateUserValues(User existingUser, UserDto newUser){
 
         if(null != newUser.getPassword()){
             existingUser.setPassword(newUser.getPassword());
@@ -91,7 +84,7 @@ public class UserServiceImpl implements UserService{
             ProfileDto profileDto = newUser.getProfile();
             Profile profile;
             if(null != existingUser.getProfile()){
-                 profile = existingUser.getProfile();
+                profile = existingUser.getProfile();
             }
             else{
                 profile = new Profile();
@@ -117,6 +110,8 @@ public class UserServiceImpl implements UserService{
             profile.setUser(existingUser);
             existingUser.setProfile(profile);
         }
-        return existingUser;
     }
+
+//    private Function<String, User> findByEmail = x -> userRepository.findByEmail(x);
+//    private Function<UserDto, User> findByUserDto = x -> findByEmail.apply(x.getEmail());
 }

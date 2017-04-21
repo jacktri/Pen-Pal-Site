@@ -3,6 +3,8 @@ package com.savory.converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.function.Function;
+
 @Component
 public class ConverterImpl implements Converter{
 
