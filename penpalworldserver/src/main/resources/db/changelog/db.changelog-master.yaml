@@ -1,0 +1,106 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: jack
+      changes:
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: profileId
+                  type: int
+
+        - createTable:
+            tableName: profile
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: profileFileLocation
+                  type: varchar(255)
+              - column:
+                  name: currentCountry
+                  type: varchar(255)
+              - column:
+                  name: homeCountry
+                  type: varchar(255)
+              - column:
+                  name: gender
+                  type: varchar(255)
+              - column:
+                  name: age
+                  type: int
+              - column:
+                  name: bio
+                  type: varchar(255)
+              - column:
+                  name: startDate
+                  type: dateTime
+              - column:
+                  name: profileViews
+                  type: int
+
+        - createTable:
+            tableName: message
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sentDateTime
+                  type: dateTime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fromId
+                  type: int
+              - column:
+                  name: ownerId
+                  type: int

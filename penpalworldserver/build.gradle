@@ -15,7 +15,6 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
@@ -32,4 +31,5 @@ dependencies {
 	compile("io.springfox:springfox-swagger-ui:2.6.1")
 	testCompile("org.springframework.boot:spring-boot-starter-test")
 	compile("org.modelmapper:modelmapper:0.7.8")
+	compile("org.liquibase:liquibase-core:3.5.3")
 }

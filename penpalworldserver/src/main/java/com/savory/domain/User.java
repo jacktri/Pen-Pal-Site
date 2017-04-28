@@ -9,6 +9,7 @@ import java.util.*;
 @Data
 @Builder
 @EqualsAndHashCode(exclude ={"profile", "messages", "penpals", "penpalsOf"} )
+@ToString(exclude = {"profile"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -59,10 +60,7 @@ public class User {
     }
 
     private boolean isFriendsWith(User user){
-        if(penpals.contains(user)){
-            return true;
-        }
-        return false;
+        return penpals.contains(user) ? true : false;
     }
 
     private void sendMessage(Message message){

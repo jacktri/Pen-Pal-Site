@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService{
         Set<User> users = newUser.getPenpalEmails().stream()
                 .map(email -> userRepository.findByEmail(email))
                 .collect(toSet());
-        users.forEach(user -> existingUser.addFriend(user));
+        users.forEach(existingUser::addFriend);
     }
 
     private void updateUserValues(User existingUser, UserDto newUser){
@@ -111,7 +111,4 @@ public class UserServiceImpl implements UserService{
             existingUser.setProfile(profile);
         }
     }
-
-//    private Function<String, User> findByEmail = x -> userRepository.findByEmail(x);
-//    private Function<UserDto, User> findByUserDto = x -> findByEmail.apply(x.getEmail());
 }
