@@ -4,6 +4,9 @@ import com.savory.domain.embeddable.ProfileStats;
 import com.savory.domain.enums.Country;
 import com.savory.domain.enums.Gender;
 import lombok.*;
+import org.hibernate.annotations.OptimisticLockType;
+import org.hibernate.annotations.OptimisticLocking;
+
 import javax.persistence.*;
 import javax.persistence.Entity;
 
@@ -13,15 +16,13 @@ import javax.persistence.Entity;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@OptimisticLocking(type = OptimisticLockType.VERSION)
 public class Profile {
 
     @Column
     @GeneratedValue
     @Id
     private Long id;
-
-    @Version
-    private Integer version;
 
     @Column
     private String profileFileLocation;

@@ -2,6 +2,9 @@ package com.savory.domain;
 
 
 import lombok.*;
+import org.hibernate.annotations.OptimisticLockType;
+import org.hibernate.annotations.OptimisticLocking;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -12,15 +15,13 @@ import java.util.*;
 @ToString(exclude = {"profile"})
 @NoArgsConstructor
 @AllArgsConstructor
+@OptimisticLocking(type = OptimisticLockType.VERSION)
 public class User {
 
     @Id
     @Column
     @GeneratedValue
     private Long id;
-
-    @Version
-    private Integer version;
 
     @Column
     private String email;
